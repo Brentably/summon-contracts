@@ -83,6 +83,10 @@ const config: HardhatUserConfig = {
       url: "https://eth-goerli.g.alchemy.com/v2/qNtE2MdnnNXNh8G5hjIZ-baxFqFnqvoQ",
       // accounts: process.env.DEV_PRIVATE_KEY != undefined ? [process.env.DEV_PRIVATE_KEY] : [],
       accounts: (process.env.DEV_PRIVATE_KEY && process.env.DEV_PRIVATE_KEY_2) ? [process.env.DEV_PRIVATE_KEY, process.env.DEV_PRIVATE_KEY_2] : []
+    },
+    mainnet: {
+      url: 'https://eth-mainnet.g.alchemy.com/v2/w_9AET4Fxc6sx6BbrvBFqP2Yr9YYmbdP',
+      accounts: (process.env.DEV_PRIVATE_KEY && process.env.DEV_PRIVATE_KEY_2) ? [process.env.DEV_PRIVATE_KEY, process.env.DEV_PRIVATE_KEY_2] : []
     }
   },
   gasReporter: {
@@ -94,7 +98,8 @@ const config: HardhatUserConfig = {
   // },
   etherscan: {
     apiKey: {
-      goerli: 'KW3JT67I7UN9YKZBR2EYCE8PYH21J1AN78'
+      goerli: 'KW3JT67I7UN9YKZBR2EYCE8PYH21J1AN78',
+      mainnet: 'KW3JT67I7UN9YKZBR2EYCE8PYH21J1AN78'
     }
   },
 

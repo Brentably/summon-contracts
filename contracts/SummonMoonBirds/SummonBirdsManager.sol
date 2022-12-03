@@ -2,9 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "./SummonV2.sol";
+import "./SummonBirds.sol";
+import './SummonBirdsUtils.sol';
+import '../GnosisSafe/handler/DefaultCallbackHandler.sol';
 
-contract SummonV2Manager {
+
+contract SummonV2Manager is SummonUtils, DefaultCallbackHandler {
   event SummonCreated(address indexed owner, address indexed summonAddress);
   event TokenLendedFrom(address indexed lender, address indexed summon, address tokenAddress, uint tokenId);
   event TokenWithdrawnTo(address indexed lender, address indexed summon, address tokenAddress, uint tokenId);
@@ -34,16 +37,7 @@ contract SummonV2Manager {
     return summon;
   }
 
-  function getEncodedToken(address tokenAddress, uint tokenId) public pure returns(bytes memory encodedToken) {
-    return abi.encode(tokenAddress, tokenId);
-  }
-
-
-  function getDecodedToken(bytes calldata _encodedToken) public pure returns(address tokenAddress, uint tokenId) {
-    (tokenAddress, tokenId) = abi.decode(_encodedToken, (address, uint));
-    return (tokenAddress, tokenId);
-  }
-
+  
 
 
 
@@ -70,15 +64,15 @@ contract SummonV2Manager {
    function withdrawTokenFromSummon(address tokenAddress, uint tokenId) public returns(bool success, bytes memory data) {
     bytes memory _encodedToken = abi.encode(tokenAddress, tokenId);
     address summonAddress = EncodedTokenToSummon[_encodedToken];
-    address lender = EncodedTokenToLender[_encodedToken];
-    require(lender == msg.sender || SummonAddressToOwner[summonAddress] == msg.sender, "caller must be lender or summon owner");
+    
+    require(EncodedTokenToLender[_encodedToken] == msg.sender || SummonAddressToOwner[summonAddress] == msg.sender, "caller must be lender or summon owner");
 
     EncodedTokenToSummon[_encodedToken] = address(0);
     EncodedTokenToLender[_encodedToken] = address(0);
 
-    (success, data) = Summon(summonAddress).safeWithdraw(tokenAddress, tokenId, lender);
+    (success, data) = Summon(summonAddress).safeWithdraw(tokenAddress, tokenId, msg.sender);
     
-    emit TokenWithdrawnTo(lender, summonAddress, tokenAddress, tokenId);
+    emit TokenWithdrawnTo(address(msg.sender), summonAddress, tokenAddress, tokenId);
     require(success, "calls call failed");
    }
 

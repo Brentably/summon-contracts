@@ -24,38 +24,39 @@ dep1Address
 // await dep2Address
 // );
 
-// const SummonV2EthersFactory = await ethers.getContractFactory(
-//   "contracts/SummonV2.sol:Summon"
-// )
+const SummonV2EthersFactory = await ethers.getContractFactory(
+  "contracts/SummonV2.sol:Summon"
+)
 
-// const gasPrice = await SummonV2EthersFactory.signer.getGasPrice();
-//   console.log(`Current gas price: ${gasPrice}`);
+const gasPrice = await SummonV2EthersFactory.signer.getGasPrice();
+  console.log(`Current gas price: ${gasPrice}`);
 
-//   const estimatedGas = await SummonV2EthersFactory.signer.estimateGas(
-//     SummonV2EthersFactory.getDeployTransaction(),
-//   );
-//   console.log(`Estimated gas: ${estimatedGas}`)
+  const estimatedGas = await SummonV2EthersFactory.signer.estimateGas(
+    SummonV2EthersFactory.getDeployTransaction(),
+  );
+  console.log(`Estimated gas: ${estimatedGas}`)
 
-//   const deploymentPrice = gasPrice.mul(estimatedGas);
-//   const deployerBalance = await SummonV2EthersFactory.signer.getBalance();
-//   console.log(`Deployer balance:  ${ethers.utils.formatEther(deployerBalance)}`);
-//   console.log(`Deployment price:  ${ethers.utils.formatEther(deploymentPrice)}`);
-//   if (deployerBalance.lt(deploymentPrice)) {
-//     throw new Error(
-//       `Insufficient funds. Top up your account balance by ${ethers.utils.formatEther(
-//         deploymentPrice.sub(deployerBalance),
-//       )}`,
-//     );
-//   }
+  const deploymentPrice = gasPrice.mul(estimatedGas);
+  const deployerBalance = await SummonV2EthersFactory.signer.getBalance();
+  console.log(`Deployer balance:  ${ethers.utils.formatEther(deployerBalance)}`);
+  console.log(`Deployment price:  ${ethers.utils.formatEther(deploymentPrice)}`);
+  if (deployerBalance.lt(deploymentPrice)) {
+    throw new Error(
+      `Insufficient funds. Top up your account balance by ${ethers.utils.formatEther(
+        deploymentPrice.sub(deployerBalance),
+      )}`,
+    );
+  }
 
 
-// const SummonV2 = await SummonV2EthersFactory.deploy();
+const SummonV2 = await SummonV2EthersFactory.deploy();
 
-// await SummonV2.deployed()
+await SummonV2.deployed()
 
-// console.log(`Singleton deployed at ${SummonV2.address}`)
-// 0xC2E50B4d75ab8c7Ba466Df9899aa03e0Ce8A527a
-const singletonAddress = '0xC2E50B4d75ab8c7Ba466Df9899aa03e0Ce8A527a'
+console.log(`Singleton deployed at ${SummonV2.address}`)
+// 0xac18AA15faEC9ACf9717E0c20BD1A682bAB957F9
+
+const singletonAddress = SummonV2.address
 
 const SummonManagerFactory = await ethers.getContractFactory(
 "contracts/SummonV2Manager.sol:SummonV2Manager"
@@ -86,7 +87,7 @@ const SummonV2Manager = await SummonManagerFactory.deploy(singletonAddress); // 
 await SummonV2Manager.deployed();
 
 console.log(`Summon V2 Manager deployed at ${SummonV2Manager.address}`)
-// 0xdc2E5925598Cde53D37b6b8428aEFc3dc1Ff677C
+// 0x594ad6ed051e18676CBF006F1cDA93137bB3d72f
 
 
 
