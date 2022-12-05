@@ -7,7 +7,7 @@ import './SummonBirdsUtils.sol';
 import '../GnosisSafe/handler/DefaultCallbackHandler.sol';
 
 
-contract SummonV2Manager is SummonUtils, DefaultCallbackHandler {
+contract SummonManager is SummonUtils, DefaultCallbackHandler {
   event SummonCreated(address indexed owner, address indexed summonAddress);
   event TokenLendedFrom(address indexed lender, address indexed summon, address tokenAddress, uint tokenId);
   event TokenWithdrawnTo(address indexed lender, address indexed summon, address tokenAddress, uint tokenId);
@@ -17,16 +17,20 @@ contract SummonV2Manager is SummonUtils, DefaultCallbackHandler {
   mapping(bytes => address) public EncodedTokenToSummon; // map from token => summon
   mapping(bytes => address) public EncodedTokenToLender; // map from token => lender
   address public immutable singleton;
+  address public immutable MOONBIRDS_ADDRESS;
+  // address public immutable MOONBIRDS_ADDRESS;
 
-  constructor(address _singleton) {
+  constructor(address _singleton, address _MOONBIRDS_ADDRESS) {
     singleton = _singleton;
+    MOONBIRDS_ADDRESS = _MOONBIRDS_ADDRESS;
+
   }
 
   function CreateNewSummon(address _owner) public returns(address) {
     require(OwnerToSummonAddress[_owner] == address(0), "address already has a Summon");
 
     address summon = Clones.clone(singleton);
-    Summon(summon).init(_owner);
+    Summon(summon).init(_owner, MOONBIRDS_ADDRESS);
 
 
 

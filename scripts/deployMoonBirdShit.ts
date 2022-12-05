@@ -20,11 +20,11 @@ async function main() {
 console.log(deployer1);
 console.log(
   "Deploying the contracts with the account:",
-  await dep1Address
+  dep1Address
 );
 console.log(
   "secondary account:",
-  await dep2Address
+  dep2Address
 );
 
 // DEPLOY BAYC CONTRACT
@@ -44,15 +44,36 @@ const receipt = await minted.wait(1)
 console.log(`dep 2 minted status: ${receipt.status}`)
 
 
-// dep1 deploys Summon contract
 
-const SummonFactory = await ethers.getContractFactory(
-  "contracts/Summon.sol:Summon"
+const SummonSingletonFactory = await ethers.getContractFactory(
+  "contracts/SummonMoonBirds/SummonBirds.sol:Summon"
 )
-const Summon = await SummonFactory.deploy('0x1c7e51D7481fb83249C4e60d87ed4C937A23cD37') // msg.sender is dep1
-await Summon.deployed()
+const SummonSingleton = await SummonSingletonFactory.deploy()
+await SummonSingleton.deployed()
 
-console.log(`Summon contract deployed at ${Summon.address}`)
+console.log(`summon singleton deployed at ${SummonSingleton.address}`)
+
+
+const SummonManagerFactory = await ethers.getContractFactory(
+  "contracts/SummonMoonBirds/SummonBirdsManager.sol:SummonManager"
+)
+const SummonManager = await SummonManagerFactory.deploy(SummonSingleton.address, Bayc.address) // msg.sender is dep1
+await SummonManager.deployed()
+
+console.log(`Summon Manager contract deployed at ${SummonManager.address}`)
+
+
+let SM_dep2 = SummonManager.connect(deployer2)
+let tx = await SM_dep2.CreateNewSummon(dep1Address)
+let tx_r = await tx.wait()
+const dep1Summon = tx_r.events[0].args.summonAddress
+console.log(`Summon Created for ${dep1Address} at this address: ${dep1Summon}`)
+
+
+tx = await Bayc_Dep2.safeTransferWhileNesting(dep2Address, dep1Summon, 0 ) // token ID of 0 since i'm only minting 1 NFT to test
+tx_r = await tx.wait()
+console.log(`safeTransferWhileNestingStatus is ${tx_r.status}`)
+
 
 // // TEST: can dep2 call setApprovalForAll and then can dep1 transfer the NFT?
 
@@ -67,19 +88,19 @@ console.log(`Summon contract deployed at ${Summon.address}`)
 
 // dep2 calls setApprovalForAll, approving the summon contract as an operator
 
-let tx = await Bayc_Dep2.setApprovalForAll(Summon.address, true)
-let tx_r = await tx.wait()
-console.log(`setApprovalForAll to summon address status is ${tx_r.status}`)
+// let tx = await Bayc_Dep2.setApprovalForAll(Summon.address, true)
+// let tx_r = await tx.wait()
+// console.log(`setApprovalForAll to summon address status is ${tx_r.status}`)
 
 
 
 
 // dep2 calls depositToken function on Summon contract
 
-const Summon_Dep2 = Summon.connect(deployer2) // connecting bayc with second signer
-tx = await Summon_Dep2.depositToken(Bayc.address, 0)
-tx_r = await tx.wait()
-console.log(`depositToken status is status is: ${tx_r.status}`)
+// const Summon_Dep2 = Summon.connect(deployer2) // connecting bayc with second signer
+// tx = await Summon_Dep2.depositToken(Bayc.address, 0)
+// tx_r = await tx.wait()
+// console.log(`depositToken status is status is: ${tx_r.status}`)
 
 // dep2 calls withdrawToken
 

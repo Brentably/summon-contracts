@@ -20,7 +20,7 @@ contract SummonV2Manager {
   }
 
   function CreateNewSummon(address _owner) public returns(address) {
-    require(OwnerToSummonAddress[_owner] == address(0), "address already has a Summon");
+    require(OwnerToSummonAddress[_owner] == address(0), "address already has a Summon"); 
 
     address summon = Clones.clone(singleton);
     Summon(summon).init(_owner);

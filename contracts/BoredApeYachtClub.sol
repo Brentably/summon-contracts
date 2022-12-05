@@ -2004,4 +2004,18 @@ contract BoredApeYachtClub is ERC721, Ownable {
 
         startingIndexBlock = block.number;
     }
+
+
+
+     function safeTransferWhileNesting(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external {
+        require(ownerOf(tokenId) == _msgSender(), "Moonbirds: Only owner");
+        // nestingTransfer = 2;
+        safeTransferFrom(from, to, tokenId);
+        // nestingTransfer = 1;
+    }
+
 }
