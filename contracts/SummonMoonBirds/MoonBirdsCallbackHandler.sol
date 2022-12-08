@@ -11,7 +11,6 @@ import "../GnosisSafe/interfaces/IERC165.sol";
 contract MoonBirdsCallbackHandler is ERC1155TokenReceiver, ERC777TokensRecipient
 // ,ERC721TokenReceiver
 ,IERC165 {
-    event MoonBirdLendedFrom(address indexed lender, uint indexed tokenId);
 
     string public constant NAME = "MoonBirds Callback Handler";
     string public constant VERSION = "1.0.0";

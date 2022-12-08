@@ -6,6 +6,9 @@ import './MoonBirdsCallbackHandler.sol';
 import "../GnosisSafe/interfaces/ERC721TokenReceiver.sol";
 
 contract Summon is SummonUtils, MoonBirdsCallbackHandler, ERC721TokenReceiver {
+  event MoonBirdLendedFrom(address indexed lender, uint indexed tokenId);
+  event MoonBirdRetrievedTo(address indexed lender, uint indexed tokenId);
+
   address public owner;
   address public SummonManager;
   address public MoonBirdsAddress;
@@ -56,25 +59,25 @@ function safeTransferWhileNesting(
     }
 */
 
-function safeWithdrawMoonBird(address tokenAddress, uint256 tokenId) public returns(bool success, bytes memory data) {
-    bytes memory encodedMoonbird = abi.encode(tokenAddress, tokenId);
+function safeWithdrawMoonBird(uint256 tokenId) public returns(bool success, bytes memory data) {
+    bytes memory encodedMoonbird = abi.encode(MOONBIRDS_ADDRESS, tokenId);
     address lender = EncodedMoonbirdToLender[encodedMoonbird];
 
     require(msg.sender == lender || msg.sender == owner, "can only be called by lender or owner");
  
     
     EncodedMoonbirdToLender[encodedMoonbird] = address(0);
-
-    (success, data) = tokenAddress.call(abi.encodeWithSignature("safeTransferWhileNesting(address,address,uint256)",address(this),lender,tokenId));
+    emit MoonBirdRetrievedTo(lender, tokenId);
+    (success, data) = MOONBIRDS_ADDRESS.call(abi.encodeWithSignature("safeTransferWhileNesting(address,address,uint256)",address(this),lender,tokenId));
     require(success, "call failed");
   }
 
 
-  function safeWithdraw(address tokenAddress, uint256 tokenId, address lender) public returns(bool success, bytes memory data) {
-    require(msg.sender == SummonManager, "can only be called by Summon Manager");
-    (success, data) = tokenAddress.call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256)",address(this),lender,tokenId));
-    require(success, "call failed");
-  }
+  // function safeWithdraw(address tokenAddress, uint256 tokenId, address lender) public returns(bool success, bytes memory data) {
+  //   require(msg.sender == SummonManager, "can only be called by Summon Manager");
+  //   (success, data) = tokenAddress.call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256)",address(this),lender,tokenId));
+  //   require(success, "call failed");
+  // }
 
 
 
